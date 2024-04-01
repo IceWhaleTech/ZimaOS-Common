@@ -38,6 +38,7 @@ func GetModel() string {
 func GetSerialNumber() string {
 	src := "/sys/class/dmi/id/board_version"
 	_, err := os.Stat(src)
+	//ccc
 	if os.IsNotExist(err) {
 		return ""
 	} else {
