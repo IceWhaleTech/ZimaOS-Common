@@ -1,4 +1,4 @@
-package zimaos_common
+package bios
 
 import (
 	"io"
