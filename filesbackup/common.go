@@ -14,11 +14,11 @@ func DefaultMetadataPath(dataPath string) string {
 	return filepath.Join(dataPath, ServiceName)
 }
 
-func GetAllBackups[Backup any](metadataPath string) (map[string][]Backup, error) {
+func GetAllBackups[M any](metadataPath string) (map[string][]M, error) {
 	// walk thru metadataPath and load each file starting with "backup_" in JSON format as a FolderBackup into a map, and return
 	// the map.
 
-	allBackups := map[string][]Backup{}
+	allBackups := map[string][]M{}
 
 	if err := filepath.WalkDir(metadataPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -29,7 +29,7 @@ func GetAllBackups[Backup any](metadataPath string) (map[string][]Backup, error)
 			return nil
 		}
 
-		backup, err := LoadMetadata[Backup](path)
+		backup, err := LoadMetadata[M](path)
 		if err != nil {
 			return fs.SkipDir
 		}
