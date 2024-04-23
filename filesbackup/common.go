@@ -47,7 +47,7 @@ func GetAllBackups[M any](metadataPath string) (map[string][]M, error) {
 	return allBackups, nil
 }
 
-func LoadMetadata[Backup any](metadataFilePath string) (*Backup, error) {
+func LoadMetadata[M any](metadataFilePath string) (*M, error) {
 	metadataFile, err := os.Open(metadataFilePath)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func LoadMetadata[Backup any](metadataFilePath string) (*Backup, error) {
 	defer metadataFile.Close()
 
 	decoder := json.NewDecoder(metadataFile)
-	var backup Backup
+	var backup M
 	if err := decoder.Decode(&backup); err != nil {
 		return nil, err
 	}
