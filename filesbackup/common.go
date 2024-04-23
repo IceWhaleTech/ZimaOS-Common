@@ -10,13 +10,15 @@ import (
 
 const ServiceName = "files-backup"
 
-func GetAllBackups[Backup any](datapath string) (map[string][]Backup, error) {
+func DefaultMetadataPath(dataPath string) string {
+	return filepath.Join(dataPath, ServiceName)
+}
+
+func GetAllBackups[Backup any](metadataPath string) (map[string][]Backup, error) {
 	// walk thru datapath and load each file starting with "backup_" in JSON format as a FolderBackup into a map, and return
 	// the map.
 
 	allBackups := map[string][]Backup{}
-
-	metadataPath := filepath.Join(datapath, ServiceName)
 
 	if err := filepath.WalkDir(metadataPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
