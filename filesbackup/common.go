@@ -15,7 +15,7 @@ func DefaultMetadataPath(dataPath string) string {
 }
 
 func GetAllBackups[Backup any](metadataPath string) (map[string][]Backup, error) {
-	// walk thru datapath and load each file starting with "backup_" in JSON format as a FolderBackup into a map, and return
+	// walk thru metadataPath and load each file starting with "backup_" in JSON format as a FolderBackup into a map, and return
 	// the map.
 
 	allBackups := map[string][]Backup{}
