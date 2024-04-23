@@ -1,4 +1,4 @@
-package backup
+package filesbackup
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const FilesBackupServiceName = "files-backup"
+const ServiceName = "files-backup"
 
 func GetAllBackups[Backup any](datapath string) (map[string][]Backup, error) {
 	// walk thru datapath and load each file starting with "backup_" in JSON format as a FolderBackup into a map, and return
@@ -16,7 +16,7 @@ func GetAllBackups[Backup any](datapath string) (map[string][]Backup, error) {
 
 	allBackups := map[string][]Backup{}
 
-	metadataPath := filepath.Join(datapath, FilesBackupServiceName)
+	metadataPath := filepath.Join(datapath, ServiceName)
 
 	if err := filepath.WalkDir(metadataPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
