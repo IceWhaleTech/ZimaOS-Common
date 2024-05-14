@@ -3,6 +3,7 @@ package bios
 import (
 	"io"
 	"os"
+	"strings"
 )
 
 const (
@@ -52,5 +53,27 @@ func GetSerialNumber() string {
 			return ""
 		}
 		return string(content)
+	}
+}
+
+func IsIceWhaleProduct() bool {
+	src := "/sys/class/dmi/id/board_vendor"
+	_, err := os.Stat(src)
+	if os.IsNotExist(err) {
+		return false
+	} else {
+		file, err := os.Open(src)
+		if err != nil {
+			return false
+		}
+		defer file.Close()
+		content, err := io.ReadAll(file)
+		if err != nil {
+			return false
+		}
+		if strings.Contains(strings.ToLower(string(content)), "icewhale") {
+			return true
+		}
+		return false
 	}
 }
