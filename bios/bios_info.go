@@ -26,20 +26,22 @@ func GetModel() string {
 		if err != nil {
 			return ""
 		}
-		if string(content) == "ZimaCube" {
+
+		if strings.Contains(strings.ToLower(string(content)), "zimacube") {
 			return ZIMACUBE
 		}
-		if string(content) == "ZimaCubePro" {
+		if strings.Contains(strings.ToLower(string(content)), "zimacubepro") {
 			return ZIMACUBEPRO
 		}
-		return ""
 
+		return ""
 	}
 }
+
 func GetSerialNumber() string {
 	src := "/sys/class/dmi/id/board_version"
 	_, err := os.Stat(src)
-	//ccc
+	// ccc
 	if os.IsNotExist(err) {
 		return ""
 	} else {
