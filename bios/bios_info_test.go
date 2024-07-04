@@ -4,15 +4,13 @@ import "testing"
 
 func TestGetModel(t *testing.T) {
 	t.Run("ZimaCube", func(t *testing.T) {
-		// ccc
 		model := GetModel()
 		t.Log("Model:", model)
 		if model != ZIMACUBE {
 			t.Errorf("Expected %s, got %s", ZIMACUBE, model)
 		}
 	})
-	t.Run("ZimaCubePro", func(t *testing.T) {
-		// ccc
+	t.Run("Zimacube Pro", func(t *testing.T) {
 		model := GetModel()
 		t.Log("Model:", model)
 		if model != ZIMACUBEPRO {
