@@ -1,10 +1,11 @@
 package bios
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGetModel(t *testing.T) {
 	t.Run("ZimaCube", func(t *testing.T) {
-		// ccc
 		model := GetModel()
 		t.Log("Model:", model)
 		if model != ZIMACUBE {
@@ -12,7 +13,14 @@ func TestGetModel(t *testing.T) {
 		}
 	})
 	t.Run("ZimaCubePro", func(t *testing.T) {
-		// ccc
+		model := GetModel()
+		t.Log("Model:", model)
+		if model != ZIMACUBEPRO {
+			t.Errorf("Expected %s, got %s", ZIMACUBEPRO, model)
+		}
+	})
+
+	t.Run("ZimaCube Pro", func(t *testing.T) {
 		model := GetModel()
 		t.Log("Model:", model)
 		if model != ZIMACUBEPRO {

@@ -16,26 +16,30 @@ func GetModel() string {
 	_, err := os.Stat(src)
 	if os.IsNotExist(err) {
 		return ""
-	} else {
-		file, err := os.Open(src)
-		if err != nil {
-			return ""
-		}
-		defer file.Close()
-		content, err := io.ReadAll(file)
-		if err != nil {
-			return ""
-		}
+	}
 
-		if strings.Contains(strings.ToLower(string(content)), "zimacube") {
-			return ZIMACUBE
-		}
-		if strings.Contains(strings.ToLower(string(content)), "zimacubepro") {
-			return ZIMACUBEPRO
-		}
-
+	file, err := os.Open(src)
+	if err != nil {
 		return ""
 	}
+	defer file.Close()
+	content, err := io.ReadAll(file)
+	if err != nil {
+		return ""
+	}
+
+	model := strings.ToLower(string(content))
+	model = strings.ReplaceAll(model, " ", "")
+	model = strings.ReplaceAll(model, "\n", "")
+
+	if model == "zimacube" {
+		return ZIMACUBE
+	}
+	if model == "zimacubepro" {
+		return ZIMACUBEPRO
+	}
+
+	return ""
 }
 
 func GetSerialNumber() string {
