@@ -5,6 +5,8 @@ go 1.21
 require github.com/maldikhan/go.socket.io v0.0.4
 
 require (
+	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/samber/lo v1.38.1 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
@@ -17,4 +19,5 @@ require (
 	github.com/IceWhaleTech/CasaOS-Common v0.4.10
 	github.com/rfyiamcool/backoff v1.1.0
 	golang.org/x/net v0.33.0 // indirect
+	gotest.tools v2.2.0+incompatible
 )
