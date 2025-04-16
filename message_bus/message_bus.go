@@ -226,7 +226,7 @@ func (s *MessageBusService) PublishEvent(eventType EventType, properties map[str
 
 	// 如果报错是 connection reset by peer，那么说明 properties 太大了,超过buffer了
 	// 后面这里应该限制事件的大小，比如不允许事件超过多少k。
-	err := s.client.Emit(eventType.Name, room, eventType.SourceID, properties, room)
+	err := s.client.Emit(eventType.Name, eventType.SourceID, properties, room)
 	s.lock.RUnlock()
 	return err
 }
