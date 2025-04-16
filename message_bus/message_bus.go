@@ -219,7 +219,20 @@ func (s *MessageBusService) JoinRoom(room string) error {
 	if s.client == nil {
 		return fmt.Errorf("message bus not connected")
 	}
-	return s.client.Emit("request-join-room", room)
+	s.rooms = append(s.rooms, room)
+	return s.client.Emit("room:join", room)
+}
+
+func (s *MessageBusService) LeaveRoom(room string) error {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	if s.client == nil {
+		return fmt.Errorf("message bus not connected")
+	}
+	s.rooms = lo.Filter(s.rooms, func(r string, _ int) bool {
+		return r != room
+	})
+	return s.client.Emit("room:leave", room)
 }
 
 func (s *MessageBusService) PublishEvent(eventType EventType, properties map[string]string) error {
