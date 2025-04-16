@@ -1,7 +1,7 @@
 package common
 
 import (
-	"github.com/IceWhaleTech/ZimaOS-Common/ysk/codegen"
+	"github.com/IceWhaleTech/ZimaOS-Common/message_bus"
 	"github.com/samber/lo"
 )
 
@@ -11,7 +11,7 @@ const (
 
 // common properties
 var (
-	PropertyTypeMessage = codegen.PropertyType{
+	PropertyTypeMessage = message_bus.PropertyType{
 		Name:        "message",
 		Description: lo.ToPtr("message at different levels, typically for error"),
 	}
@@ -19,13 +19,13 @@ var (
 
 // app properties
 var (
-	PropertyTypeCardID = codegen.PropertyType{
+	PropertyTypeCardID = message_bus.PropertyType{
 		Name:        "card:id",
 		Description: lo.ToPtr("card id"),
 		Example:     lo.ToPtr("task:application:install"),
 	}
 
-	PropertyTypeCardBody = codegen.PropertyType{
+	PropertyTypeCardBody = message_bus.PropertyType{
 		Name:        "card:body",
 		Description: lo.ToPtr("card body"),
 		Example:     lo.ToPtr("{xxxxxx}"),
@@ -33,18 +33,20 @@ var (
 )
 
 var (
-	EventTypeYSKCardUpsert = codegen.EventType{
+	EventTypeYSKCardUpsert = message_bus.EventType{
 		SourceID: SERVICENAME,
 		Name:     "ysk:card:upsert",
-		PropertyTypeList: []codegen.PropertyType{
+		Room:     "ysk",
+		PropertyTypeList: []message_bus.PropertyType{
 			PropertyTypeCardBody,
 		},
 	}
 
-	EventTypeYSKCardDelete = codegen.EventType{
+	EventTypeYSKCardDelete = message_bus.EventType{
 		SourceID: SERVICENAME,
 		Name:     "ysk:card:delete",
-		PropertyTypeList: []codegen.PropertyType{
+		Room:     "ysk",
+		PropertyTypeList: []message_bus.PropertyType{
 			PropertyTypeCardID,
 		},
 	}
