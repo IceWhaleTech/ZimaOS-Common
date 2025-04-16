@@ -22,6 +22,7 @@ var needToReconnectMsg = sync.WaitGroup{}
 type MessageBusService struct {
 	client    *socketio.Client
 	listeners map[string][]func(Event)
+	rooms     []string
 	backoff   *backoff.Backoff
 	lock      sync.RWMutex
 }
@@ -55,7 +56,9 @@ func (l loggerImpl) Errorf(format string, v ...any) {
 	}
 }
 
-func NewMessageBusService() *MessageBusService {
+func NewMessageBusService(
+	rooms []string,
+) *MessageBusService {
 	b := backoff.NewBackOff(
 		backoff.WithMinDelay(1*time.Second),
 		backoff.WithMaxDelay(20*time.Second),
@@ -65,6 +68,7 @@ func NewMessageBusService() *MessageBusService {
 	service := &MessageBusService{
 		listeners: make(map[string][]func(Event)),
 		backoff:   b,
+		rooms:     rooms,
 	}
 	go func() {
 		// 这里使用避火算法
@@ -112,6 +116,15 @@ func (s *MessageBusService) connect() {
 		log.Printf("Failed to connect to message bus: %v", err)
 		return
 	}
+
+	client.On("connect", func() {
+		for _, room := range s.rooms {
+			err := client.Emit("request-join-room", room)
+			if err != nil {
+				logger.Error("Failed to request join room", zap.String("room", room), zap.Error(err))
+			}
+		}
+	})
 
 	needToReconnectMsg.Add(1)
 
@@ -198,6 +211,15 @@ func (s *MessageBusService) AddEventHandler(eventType string, handler func(Event
 		}
 		handler(msgEvent)
 	})
+}
+
+func (s *MessageBusService) JoinRoom(room string) error {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	if s.client == nil {
+		return fmt.Errorf("message bus not connected")
+	}
+	return s.client.Emit("request-join-room", room)
 }
 
 func (s *MessageBusService) PublishEvent(eventType EventType, properties map[string]string) error {
