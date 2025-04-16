@@ -229,7 +229,6 @@ func (s *MessageBusService) AddEventHandler(eventName string, handler func(Event
 		return
 	}
 
-	logger.Info("add event handler", zap.Any("event name", eventName))
 	AddEventHandler(eventName, handler, s.client)
 }
 
