@@ -31,4 +31,7 @@ type Event struct {
 
 	// Uuid event uuid
 	Uuid *string `json:"uuid,omitempty"`
+
+	// Room event room
+	Room string `json:"room"`
 }

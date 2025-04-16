@@ -39,6 +39,15 @@ func (l loggerImpl) Warnf(format string, v ...any) {
 }
 
 func (l loggerImpl) Errorf(format string, v ...any) {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Error("Recovered from panic in connect", zap.Any("error", r))
+			needToReconnectMsg = sync.WaitGroup{}
+		}
+	}()
+
+	needToReconnectMsg.Done()
+
 	logger.Error(fmt.Sprintf(format, v...))
 	if format == "receiveWsError: %v" && len(v) > 0 {
 		errStr := ""
@@ -59,6 +68,7 @@ func (l loggerImpl) Errorf(format string, v ...any) {
 func NewMessageBusService(
 	rooms []string,
 ) *MessageBusService {
+
 	b := backoff.NewBackOff(
 		backoff.WithMinDelay(1*time.Second),
 		backoff.WithMaxDelay(20*time.Second),
@@ -71,6 +81,7 @@ func NewMessageBusService(
 		rooms:     rooms,
 	}
 	go func() {
+
 		// 这里使用避火算法
 		for {
 			// 这里设成nil，是为了解决重连时msg可能的发送失败
@@ -88,6 +99,13 @@ func NewMessageBusService(
 }
 
 func (s *MessageBusService) connect() {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Error("Recovered from panic in connect", zap.Any("error", r))
+			needToReconnectMsg = sync.WaitGroup{}
+		}
+	}()
+
 	messageURLFile := "/var/run/casaos/message-bus.url"
 	messageURL, err := os.ReadFile(messageURLFile)
 	if err != nil {
@@ -119,9 +137,9 @@ func (s *MessageBusService) connect() {
 
 	client.On("connect", func() {
 		for _, room := range s.rooms {
-			err := client.Emit("request-join-room", room)
+			err := s.JoinRoom(room)
 			if err != nil {
-				logger.Error("Failed to request join room", zap.String("room", room), zap.Error(err))
+				logger.Error("Failed to join room", zap.String("room", room), zap.Error(err))
 			}
 		}
 	})
@@ -144,11 +162,10 @@ func (s *MessageBusService) connect() {
 	// case2. message bus没连上，然后一个个添加addEventHandler到s.listeners，等连上的时候重新监听所有的事件
 	// case3. message bus连上了，为了避免 s.client = client 之后cpu切出去执行 AddEventHandler，然后再回来执行 for ，导致重复监听
 
-	logger.Info("listeners", zap.Any("listeners", len(s.listeners)))
 	// 把 listeners 重新监听上
 	for eventType, handlers := range s.listeners {
 		for _, handler := range handlers {
-			s.AddEventHandler(eventType, handler, client)
+			AddEventHandler(eventType, handler, client)
 		}
 	}
 
@@ -160,29 +177,14 @@ func (s *MessageBusService) connect() {
 	needToReconnectMsg.Wait()
 }
 
-func (s *MessageBusService) AddEventHandler(eventType string, handler func(Event), targetClient *socketio.Client) {
-	s.listeners[eventType] = append(s.listeners[eventType], handler)
+func AddEventHandler(eventName string, handler func(Event), targetClient *socketio.Client) {
+	logger.Info("add event handler", zap.Any("event name", eventName))
 
-	s.lock.RLock()
-	defer s.lock.RUnlock()
-	if targetClient == nil && s.client == nil {
-		// 如果client没有建立，先加到listeners。等msg bus连上了再初始化
-
-		// 上面是先把现在的handlers都加到client，才添加到client。
-		// 避免这里添加一次事件，然后初始化又添加一次的双重监听
-		logger.Info("client is nil, wait to add event handler", zap.Any("event name", eventType))
-		return
-	}
-
-	logger.Info("add event handler", zap.Any("event name", eventType))
-	if targetClient == nil {
-		targetClient = s.client
-	}
-	targetClient.On(eventType, func(event interface{}) {
+	targetClient.On(eventName, func(event interface{}) {
 		rawEvent := event.(map[string]interface{})
 
 		var msgEvent Event
-		msgEvent.Name = eventType
+		msgEvent.Name = eventName
 
 		if _, ok := rawEvent["SourceID"]; ok {
 			msgEvent.SourceID = rawEvent["SourceID"].(string)
@@ -211,6 +213,24 @@ func (s *MessageBusService) AddEventHandler(eventType string, handler func(Event
 		}
 		handler(msgEvent)
 	})
+}
+
+func (s *MessageBusService) AddEventHandler(eventName string, handler func(Event)) {
+	s.listeners[eventName] = append(s.listeners[eventName], handler)
+
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	if s.client == nil {
+		// 如果client没有建立，先加到listeners。等msg bus连上了再初始化
+
+		// 上面是先把现在的handlers都加到client，才添加到client。
+		// 避免这里添加一次事件，然后初始化又添加一次的双重监听
+		logger.Info("client is nil, wait to add event handler", zap.Any("event name", eventName))
+		return
+	}
+
+	logger.Info("add event handler", zap.Any("event name", eventName))
+	AddEventHandler(eventName, handler, s.client)
 }
 
 func (s *MessageBusService) JoinRoom(room string) error {
