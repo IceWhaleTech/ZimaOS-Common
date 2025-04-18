@@ -26,3 +26,13 @@ func TestGetModel(t *testing.T) {
 		}
 	})
 }
+
+func TestGetDeviceImageByModel(t *testing.T) {
+	t.Run("ZimaCube", func(t *testing.T) {
+		img, err := GetDeviceImageByModel()
+		t.Log("Image:", img)
+		if err != nil {
+			t.Errorf("Expected no error, got %s", err)
+		}
+	})
+}
