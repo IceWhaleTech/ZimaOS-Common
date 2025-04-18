@@ -1,6 +1,8 @@
 package bios
 
 import (
+	"embed"
+	"encoding/base64"
 	"os"
 	"strings"
 )
@@ -14,6 +16,9 @@ const (
 	ZIMACUBE    = "ZimaCube"
 	ZIMACUBEPRO = "ZimaCube Pro"
 )
+
+//go:embed assets/*
+var assets embed.FS
 
 func GetModel() string {
 	src := "/sys/class/dmi/id/board_version"
@@ -51,4 +56,31 @@ func GetSerialNumber() (string, error) {
 func IsIceWhaleProduct() bool {
 	b, err := os.ReadFile("/sys/class/dmi/id/board_vendor")
 	return err == nil && strings.Contains(strings.ToLower(string(b)), "icewhale")
+}
+
+func GetDeviceImageByModel() (string, error) {
+	getImageBase64 := func(name string) (string, error) {
+		data, err := os.ReadFile(name)
+		if err != nil {
+			return "", err
+		}
+
+		imgBase64 := base64.StdEncoding.EncodeToString(data)
+
+		return imgBase64, nil
+	}
+
+	model := GetModel()
+	switch model {
+	case ZIMACUBE:
+		return getImageBase64("cube.png")
+	case ZIMACUBEPRO:
+		return getImageBase64("cube.png")
+	case ZIMABOARD:
+		return getImageBase64("board.png")
+	case ZIMABOARD2:
+		return getImageBase64("board2.png")
+	default:
+		return getImageBase64("other.png")
+	}
 }
