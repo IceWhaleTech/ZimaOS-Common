@@ -60,7 +60,7 @@ func IsIceWhaleProduct() bool {
 
 func GetDeviceImageByModel() (string, error) {
 	getImageBase64 := func(name string) (string, error) {
-		data, err := os.ReadFile(name)
+		data, err := assets.ReadFile(name)
 		if err != nil {
 			return "", err
 		}
@@ -73,14 +73,16 @@ func GetDeviceImageByModel() (string, error) {
 	model := GetModel()
 	switch model {
 	case ZIMACUBE:
-		return getImageBase64("cube.png")
+		return getImageBase64("assets/cube.png")
 	case ZIMACUBEPRO:
-		return getImageBase64("cube.png")
+		return getImageBase64("assets/cube.png")
 	case ZIMABOARD:
-		return getImageBase64("board.png")
+		return getImageBase64("assets/board.png")
 	case ZIMABOARD2:
-		return getImageBase64("board2.png")
+		return getImageBase64("assets/board2.png")
+	case ZIMABLADE:
+		return getImageBase64("assets/board.png")
 	default:
-		return getImageBase64("other.png")
+		return getImageBase64("assets/other.png")
 	}
 }
