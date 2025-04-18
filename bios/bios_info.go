@@ -2,7 +2,6 @@ package bios
 
 import (
 	"embed"
-	"encoding/base64"
 	"os"
 	"strings"
 )
@@ -56,33 +55,4 @@ func GetSerialNumber() (string, error) {
 func IsIceWhaleProduct() bool {
 	b, err := os.ReadFile("/sys/class/dmi/id/board_vendor")
 	return err == nil && strings.Contains(strings.ToLower(string(b)), "icewhale")
-}
-
-func GetDeviceImageByModel() (string, error) {
-	getImageBase64 := func(name string) (string, error) {
-		data, err := assets.ReadFile(name)
-		if err != nil {
-			return "", err
-		}
-
-		imgBase64 := base64.StdEncoding.EncodeToString(data)
-
-		return imgBase64, nil
-	}
-
-	model := GetModel()
-	switch model {
-	case ZIMACUBE:
-		return getImageBase64("assets/cube.png")
-	case ZIMACUBEPRO:
-		return getImageBase64("assets/cube.png")
-	case ZIMABOARD:
-		return getImageBase64("assets/board.png")
-	case ZIMABOARD2:
-		return getImageBase64("assets/board2.png")
-	case ZIMABLADE:
-		return getImageBase64("assets/board.png")
-	default:
-		return getImageBase64("assets/other.png")
-	}
 }
