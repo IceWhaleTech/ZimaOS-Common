@@ -1,85 +1,86 @@
 package bios
 
 import (
-	"io"
+	"embed"
+	"encoding/base64"
 	"os"
 	"strings"
 )
 
 const (
+	ZIMABLADE = "ZimaBlade"
+
+	ZIMABOARD  = "ZimaBoard"
+	ZIMABOARD2 = "ZimaBoard V2"
+
 	ZIMACUBE    = "ZimaCube"
 	ZIMACUBEPRO = "ZimaCube Pro"
 )
 
+//go:embed assets/*
+var assets embed.FS
+
 func GetModel() string {
 	src := "/sys/class/dmi/id/board_version"
-	_, err := os.Stat(src)
-	if os.IsNotExist(err) {
-		return ""
-	}
-
-	file, err := os.Open(src)
-	if err != nil {
-		return ""
-	}
-	defer file.Close()
-	content, err := io.ReadAll(file)
+	data, err := os.ReadFile(src)
 	if err != nil {
 		return ""
 	}
 
-	model := strings.ToLower(string(content))
+	model := strings.ToLower(strings.TrimSpace(string(data)))
 	model = strings.ReplaceAll(model, " ", "")
 	model = strings.ReplaceAll(model, "\n", "")
 
-	if model == "zimacube" {
+	switch model {
+	case "zimacube":
 		return ZIMACUBE
-	}
-	if model == "zimacubepro" {
+	case "zimacubepro":
 		return ZIMACUBEPRO
+	case "zmb1.0":
+		return ZIMABOARD
+	case "":
+		return ZIMABOARD2
 	}
 
 	return ""
 }
 
-func GetSerialNumber() string {
-	src := "/sys/class/dmi/id/board_version"
-	_, err := os.Stat(src)
-	// ccc
-	if os.IsNotExist(err) {
-		return ""
-	} else {
-		file, err := os.Open(src)
-		if err != nil {
-			return ""
-		}
-		defer file.Close()
-		content, err := io.ReadAll(file)
-		if err != nil {
-			return ""
-		}
-		return string(content)
+func GetSerialNumber() (string, error) {
+	data, err := os.ReadFile("/sys/class/dmi/id/board_serial")
+	if err != nil {
+		return "", err
 	}
+	return strings.TrimSpace(string(data)), nil
 }
 
 func IsIceWhaleProduct() bool {
-	src := "/sys/class/dmi/id/board_vendor"
-	_, err := os.Stat(src)
-	if os.IsNotExist(err) {
-		return false
-	} else {
-		file, err := os.Open(src)
+	b, err := os.ReadFile("/sys/class/dmi/id/board_vendor")
+	return err == nil && strings.Contains(strings.ToLower(string(b)), "icewhale")
+}
+
+func GetDeviceImageByModel() (string, error) {
+	getImageBase64 := func(name string) (string, error) {
+		data, err := os.ReadFile(name)
 		if err != nil {
-			return false
+			return "", err
 		}
-		defer file.Close()
-		content, err := io.ReadAll(file)
-		if err != nil {
-			return false
-		}
-		if strings.Contains(strings.ToLower(string(content)), "icewhale") {
-			return true
-		}
-		return false
+
+		imgBase64 := base64.StdEncoding.EncodeToString(data)
+
+		return imgBase64, nil
+	}
+
+	model := GetModel()
+	switch model {
+	case ZIMACUBE:
+		return getImageBase64("cube.png")
+	case ZIMACUBEPRO:
+		return getImageBase64("cube.png")
+	case ZIMABOARD:
+		return getImageBase64("board.png")
+	case ZIMABOARD2:
+		return getImageBase64("board2.png")
+	default:
+		return getImageBase64("other.png")
 	}
 }
