@@ -1,7 +1,6 @@
 package bios
 
 import (
-	"embed"
 	"os"
 	"strings"
 )
@@ -10,14 +9,11 @@ const (
 	ZIMABLADE = "ZimaBlade"
 
 	ZIMABOARD  = "ZimaBoard"
-	ZIMABOARD2 = "ZimaBoard V2"
+	ZIMABOARD2 = "ZimaBoard2"
 
 	ZIMACUBE    = "ZimaCube"
 	ZIMACUBEPRO = "ZimaCube Pro"
 )
-
-//go:embed assets/*
-var assets embed.FS
 
 func GetModel() string {
 	src := "/sys/class/dmi/id/board_version"
