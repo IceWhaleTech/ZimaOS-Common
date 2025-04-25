@@ -16,25 +16,31 @@ const (
 )
 
 func GetModel() string {
-	src := "/sys/class/dmi/id/board_version"
-	data, err := os.ReadFile(src)
+	data, err := os.ReadFile("/sys/class/dmi/id/board_name")
 	if err != nil {
 		return ""
 	}
+	boardName := strings.ToLower(strings.TrimSpace(string(data)))
 
-	model := strings.ToLower(strings.TrimSpace(string(data)))
-	model = strings.ReplaceAll(model, " ", "")
-	model = strings.ReplaceAll(model, "\n", "")
+	data, err = os.ReadFile("/sys/class/dmi/id/board_version")
+	if err != nil {
+		return ""
+	}
+	boardVersion := strings.ToLower(strings.TrimSpace(string(data)))
 
-	switch model {
-	case "zimacube":
-		return ZIMACUBE
-	case "zimacubepro":
+	info := boardName + " " + boardVersion
+
+	switch {
+	case strings.Contains(info, "zimacube pro"):
 		return ZIMACUBEPRO
-	case "zmb1.0":
-		return ZIMABOARD
-	case "":
+	case strings.Contains(info, "zimacube"):
+		return ZIMACUBE
+	case strings.Contains(info, "zimaboard2"):
 		return ZIMABOARD2
+	case strings.Contains(info, "zimaboard"):
+		return ZIMABOARD
+	case strings.Contains(info, "zbb001"):
+		return ZIMABLADE
 	}
 
 	return ""
