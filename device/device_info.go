@@ -12,5 +12,5 @@ func GetDeviceType() string {
 		return ""
 	}
 
-	return gjson.GetBytes(data, "device.type").String()
+	return gjson.GetBytes(data, "device.model").String()
 }
