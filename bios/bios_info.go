@@ -21,17 +21,19 @@ func GetModel() string {
 		return ""
 	}
 	boardName := strings.ToLower(strings.TrimSpace(string(data)))
+	boardName = strings.ReplaceAll(boardName, " ", "")
 
 	data, err = os.ReadFile("/sys/class/dmi/id/board_version")
 	if err != nil {
 		return ""
 	}
 	boardVersion := strings.ToLower(strings.TrimSpace(string(data)))
+	boardVersion = strings.ReplaceAll(boardVersion, " ", "")
 
 	info := boardName + " " + boardVersion
 
 	switch {
-	case strings.Contains(info, "zimacube pro"):
+	case strings.Contains(info, "zimacubepro"):
 		return ZIMACUBEPRO
 	case strings.Contains(info, "zimacube"):
 		return ZIMACUBE
