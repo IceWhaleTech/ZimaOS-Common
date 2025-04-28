@@ -7,6 +7,7 @@ require (
 	github.com/maldikhan/go.socket.io v0.0.4
 	github.com/rfyiamcool/backoff v1.1.0
 	github.com/samber/lo v1.49.1
+	github.com/tidwall/gjson v1.17.0
 	go.uber.org/zap v1.27.0
 	gotest.tools v2.2.0+incompatible
 )
@@ -14,6 +15,8 @@ require (
 require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
