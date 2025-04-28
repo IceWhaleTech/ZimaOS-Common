@@ -6,11 +6,11 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetDeviceType() (string, error) {
+func GetDeviceType() string {
 	data, err := os.ReadFile("/run/zimaos/device-info.json")
 	if err != nil {
-		return "", err
+		return ""
 	}
 
-	return gjson.GetBytes(data, "device.type").String(), nil
+	return gjson.GetBytes(data, "device.type").String()
 }
