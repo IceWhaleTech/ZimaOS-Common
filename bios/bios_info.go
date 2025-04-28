@@ -6,43 +6,31 @@ import (
 )
 
 const (
-	ZIMABLADE = "ZimaBlade"
-
-	ZIMABOARD  = "ZimaBoard"
-	ZIMABOARD2 = "ZimaBoard2"
-
 	ZIMACUBE    = "ZimaCube"
-	ZIMACUBEPRO = "ZimaCube Pro"
+	ZIMACUBEPRO = "ZimaCubePro"
 )
 
 func GetModel() string {
-	data, err := os.ReadFile("/sys/class/dmi/id/board_name")
+	src := "/sys/class/dmi/id/board_version"
+	_, err := os.Stat(src)
+	if os.IsNotExist(err) {
+		return ""
+	}
+
+	content, err := os.ReadFile(src)
 	if err != nil {
 		return ""
 	}
-	boardName := strings.ToLower(strings.TrimSpace(string(data)))
-	boardName = strings.ReplaceAll(boardName, " ", "")
 
-	data, err = os.ReadFile("/sys/class/dmi/id/board_version")
-	if err != nil {
-		return ""
-	}
-	boardVersion := strings.ToLower(strings.TrimSpace(string(data)))
-	boardVersion = strings.ReplaceAll(boardVersion, " ", "")
+	model := strings.ToLower(string(content))
+	model = strings.ReplaceAll(model, " ", "")
+	model = strings.ReplaceAll(model, "\n", "")
 
-	info := boardName + " " + boardVersion
-
-	switch {
-	case strings.Contains(info, "zimacubepro"):
-		return ZIMACUBEPRO
-	case strings.Contains(info, "zimacube"):
+	if model == "zimacube" {
 		return ZIMACUBE
-	case strings.Contains(info, "zimaboard2"):
-		return ZIMABOARD2
-	case strings.Contains(info, "zimaboard"):
-		return ZIMABOARD
-	case strings.Contains(info, "zbb001"):
-		return ZIMABLADE
+	}
+	if model == "zimacubepro" {
+		return ZIMACUBEPRO
 	}
 
 	return ""
