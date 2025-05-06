@@ -8,7 +8,7 @@ import (
 
 const (
 	ZIMACUBE    = "ZimaCube"
-	ZIMACUBEPRO = "ZimaCube-Pro"
+	ZIMACUBEPRO = "ZimaCube Pro"
 	ZIMABOARD   = "ZimaBoard"
 	ZIMABLADE   = "ZimaBlade"
 	ZIMABOARD2  = "ZimaBoard2"

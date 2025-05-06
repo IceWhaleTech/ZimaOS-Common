@@ -7,7 +7,7 @@ import (
 
 const (
 	ZIMACUBE    = "ZimaCube"
-	ZIMACUBEPRO = "ZimaCubePro"
+	ZIMACUBEPRO = "ZimaCube Pro"
 )
 
 func GetModel() string {
