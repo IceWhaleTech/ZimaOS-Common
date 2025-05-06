@@ -23,12 +23,3 @@ func GetDeviceType() string {
 
 	return gjson.GetBytes(data, "device.model").String()
 }
-
-func GetHostName() string {
-	data, err := os.ReadFile("/run/zimaos/device-info.json")
-	if err != nil {
-		return ZIMAOS
-	}
-
-	return gjson.GetBytes(data, "hostname").String()
-}
