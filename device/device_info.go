@@ -8,7 +8,7 @@ import (
 
 const (
 	ZIMACUBE    = "ZimaCube"
-	ZIMACUBEPRO = "ZimaCube-Pro"
+	ZIMACUBEPRO = "ZimaCube Pro"
 	ZIMABOARD   = "ZimaBoard"
 	ZIMABLADE   = "ZimaBlade"
 	ZIMABOARD2  = "ZimaBoard2"
@@ -22,4 +22,13 @@ func GetDeviceType() string {
 	}
 
 	return gjson.GetBytes(data, "device.model").String()
+}
+
+func GetHostName() string {
+	data, err := os.ReadFile("/run/zimaos/device-info.json")
+	if err != nil {
+		return ZIMAOS
+	}
+
+	return gjson.GetBytes(data, "hostname").String()
 }
