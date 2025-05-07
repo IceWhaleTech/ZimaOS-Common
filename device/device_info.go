@@ -15,7 +15,7 @@ const (
 	ZIMAOS      = "ZimaOS"
 )
 
-func GetDeviceType() string {
+func GetDeviceModel() string {
 	data, err := os.ReadFile("/run/zimaos/device-info.json")
 	if err != nil {
 		return ZIMAOS
