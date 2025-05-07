@@ -4,7 +4,7 @@ import "testing"
 
 func TestGetDeviceType(t *testing.T) {
 	t.Run("", func(t *testing.T) {
-		model := GetDeviceType()
+		model := GetDeviceModel()
 		t.Log("Model:", model)
 	})
 }
