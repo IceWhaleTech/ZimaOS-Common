@@ -46,6 +46,8 @@ func (l loggerImpl) Errorf(format string, v ...any) {
 		}
 	}()
 
+	logger.Error(fmt.Sprintf(format, v...))
+
 	needToReconnectMsg.Done()
 }
 
