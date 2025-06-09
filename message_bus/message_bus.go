@@ -46,23 +46,7 @@ func (l loggerImpl) Errorf(format string, v ...any) {
 		}
 	}()
 
-	logger.Error(fmt.Sprintf(format, v...))
-	if format == "receiveWsError: %v" && len(v) > 0 {
-		errStr := ""
-		switch e := v[0].(type) {
-		case string:
-			errStr = e
-		case error:
-			errStr = e.Error()
-		}
-
-		if errStr == "EOF" {
-			logger.Info("msg bus got unexpected EOF, try to reconnect")
-			needToReconnectMsg.Done()
-		}
-	} else {
-		needToReconnectMsg.Done()
-	}
+	needToReconnectMsg.Done()
 }
 
 func NewMessageBusService(
