@@ -46,29 +46,14 @@ func (l loggerImpl) Errorf(format string, v ...any) {
 		}
 	}()
 
-	needToReconnectMsg.Done()
-
 	logger.Error(fmt.Sprintf(format, v...))
-	if format == "receiveWsError: %v" && len(v) > 0 {
-		errStr := ""
-		switch e := v[0].(type) {
-		case string:
-			errStr = e
-		case error:
-			errStr = e.Error()
-		}
 
-		if errStr == "EOF" {
-			logger.Info("msg bus got unexpected EOF, try to reconnect")
-			needToReconnectMsg.Done()
-		}
-	}
+	needToReconnectMsg.Done()
 }
 
 func NewMessageBusService(
 	rooms []string,
 ) *MessageBusService {
-
 	b := backoff.NewBackOff(
 		backoff.WithMinDelay(1*time.Second),
 		backoff.WithMaxDelay(20*time.Second),
@@ -81,7 +66,6 @@ func NewMessageBusService(
 		rooms:     rooms,
 	}
 	go func() {
-
 		// 这里使用避火算法
 		for {
 			// 这里设成nil，是为了解决重连时msg可能的发送失败
@@ -123,7 +107,6 @@ func (s *MessageBusService) connect() {
 		socketio.WithRawURL(fmt.Sprintf("%s/v2/message_bus/socket.io", messageURL)),
 		socketio.WithLogger(loggerImpl{}),
 	)
-
 	if err != nil {
 		log.Printf("Failed to create socket.io client: %v", err)
 		return
